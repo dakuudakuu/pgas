@@ -23,10 +23,12 @@ export default class Game {
     }
 
     update(dt) {
+        this.character.handleInput(this.input);
         this.character.update(dt);
     }
 
     draw() {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.character.draw(this.ctx);
     }
 }
