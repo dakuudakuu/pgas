@@ -1,9 +1,12 @@
 export default class InputHandler {
     constructor() {
         this.keys = {};
+        this.justPressed = {};
 
         window.addEventListener("keydown", (e) => {
-            this.keys[e.key.toLowerCase()] = true;
+            const key = e.key.toLowerCase();
+            if (!this.keys[key]) this.justPressed[key] = true;
+            this.keys[key] = true;
         });
 
         window.addEventListener("keyup", (e) => {
@@ -13,5 +16,13 @@ export default class InputHandler {
 
     isDown(key) {
         return !!this.keys[key];
+    }
+
+    wasPressed(key) {
+        return !!this.justPressed[key];
+    }
+
+    flush() {
+        this.justPressed = {};
     }
 }
