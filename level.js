@@ -1,7 +1,6 @@
 import Character from "./character.js";
-import { rectIntersects } from "./rectIntersects.js";
 
-export default class Level {
+export class Level {
     constructor(ctx, input, data) {
         this.ctx = ctx;
         this.input = input;

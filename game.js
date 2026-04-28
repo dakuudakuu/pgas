@@ -1,4 +1,4 @@
-import Level from "./level.js";
+import { Level } from "./level.js";
 import level1Data from "./level1Data.js";
 
 export default class Game {
