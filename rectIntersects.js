@@ -1,3 +1,4 @@
+//Returns true if the rectangles passed in overlap in any way
 export function rectIntersects(a, b) {
     return (
         a.x < b.x + b.width &&

@@ -51,10 +51,10 @@ export default class Character {
         }
 
         if(this.up && this.grounded) {
-            this.vy = -300;
+            this.vy = -400;
         } else if(this.up && this.airJumps == 0) {
             this.airJumps++;
-            this.vy = -300;
+            this.vy = -400;
         }
     }
 
