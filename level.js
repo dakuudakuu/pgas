@@ -56,7 +56,7 @@ export class Level {
     }
 
     drawUI() {  
-        this.ctx.font = "50px Arial";
+        this.ctx.font = "10px Arial";
         this.ctx.fillStyle = "white";
         this.ctx.fillText("Altitude: " + Math.floor(this.altitude), 10, 10);
     }
