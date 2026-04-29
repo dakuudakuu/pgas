@@ -7,6 +7,8 @@ export default class Game {
         this.input = input;
         this.currentLevel = null;
         this.lastTime = 0;
+        this.startTime = performance.now() / 1000;
+        this.elapsedTime = null;
     }
 
     start() {
@@ -22,6 +24,8 @@ export default class Game {
         const dt = (timestamp - this.lastTime) / 1000;
         this.lastTime = timestamp;
 
+        this.elapsedTime = (performance.now() - this.startTime) / 1000;
+
         this.update(dt);
         this.draw();
         this.input.flush();
@@ -30,7 +34,7 @@ export default class Game {
     }
 
     update(dt) {
-        this.currentLevel?.update(dt);
+        this.currentLevel?.update(dt, this.elapsedTime);
     }
 
     draw() {

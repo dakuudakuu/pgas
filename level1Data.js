@@ -5,7 +5,8 @@ const basePlatform = {
     fromBottom: -800,
     width: 10000,
     height: 800,
-    color: "green"
+    color: "green",
+    moving: false
 };
 
 export default {
@@ -13,12 +14,12 @@ export default {
     spawnPointY: 100,
     backgroundColor: "#000000",
     speed: 300,
-    gravity: 700,
+    gravity: 750,
     platforms: [
        basePlatform,
        ...generatePlatforms(
-            3,
-            100,
+            6767,
+            10000,
             100
        )
     ]

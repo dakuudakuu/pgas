@@ -37,11 +37,10 @@ export function generatePlatforms(seed, count, startX) {
             transitionSteps = Math.floor(randomBetween(rng, 2, 4));
         }
 
-
         let gap, heightDelta;
 
         if (transitioning || platformsUntilSwitch <= 2) {
-            heightDelta = randomBetween(rng, 80, 150);
+            heightDelta = randomBetween(rng, 80, 140);
             gap = randomBetween(rng, 100, 150);
             if (transitioning) {
                 transitionSteps--;
@@ -53,8 +52,8 @@ export function generatePlatforms(seed, count, startX) {
 
             const bigJump = rng() < 0.25;
             const maxHeight = bigJump
-                ? randomBetween(rng, 100, 150)
-                : (150 - t * 100) * randomBetween(rng, 0.3, 1.5);
+                ? randomBetween(rng, 100, 130)
+                : (130 - t * 100) * randomBetween(rng, 0.3, 1.5);
 
             heightDelta = randomBetween(rng, 80, Math.max(80, maxHeight));
         }
@@ -62,15 +61,23 @@ export function generatePlatforms(seed, count, startX) {
         heightDelta = Math.min(heightDelta, 200);
         fromBottom += heightDelta;
 
-        const width = randomBetween(rng, 30, 200);
-        const height = randomBetween(rng, 10, 80);
+        const width = randomBetween(rng, 50, 200);
+        const height = 50;
+
+        const moving = Math.round(randomBetween(rng, 0, 6)) == 1;
+        const amplitude = randomBetween(rng, 80, 120);
+        const speed = randomBetween(rng, 0.5, 4);
 
         platforms.push({
+            baseX: Math.floor(x),
             x: Math.floor(x),
             fromBottom: Math.floor(fromBottom),
             width: Math.floor(width),
             height: Math.floor(height),
-            color: randomColor(rng)
+            color: randomColor(rng),
+            moving: moving,
+            amplitude: amplitude,
+            speed: speed
         });
 
         x += direction * (width + gap);
