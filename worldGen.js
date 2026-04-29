@@ -61,12 +61,15 @@ export function generatePlatforms(seed, count, startX) {
         heightDelta = Math.min(heightDelta, 200);
         fromBottom += heightDelta;
 
-        const width = randomBetween(rng, 50, 200);
+        const width = randomBetween(rng, 50, 400);
         const height = 50;
 
-        const moving = Math.round(randomBetween(rng, 0, 6)) == 1;
+        const moving = Math.round(randomBetween(rng, 0, 4)) == 1;
         const amplitude = randomBetween(rng, 80, 120);
-        const speed = randomBetween(rng, 0.5, 4);
+        let speed = 0;
+        if(moving) {
+            speed = randomBetween(rng, 0.4, 5);
+        }
 
         platforms.push({
             baseX: Math.floor(x),

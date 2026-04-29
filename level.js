@@ -7,7 +7,7 @@ export class Level {
         this.ctx = ctx;
         this.input = input;
         this.data = data;
-        this.character = new Character(data.spawnPointX, this.ctx.canvas.logicalHeight - 150, 75, 50, "lime", data.speed, data.gravity);
+        this.character = new Character(data.spawnPointX, this.ctx.canvas.logicalHeight - 150, 100, 50, "lime", data.speed, data.gravity);
         this.camera = new Camera(ctx);
         this.elapsedTime = null;
 
@@ -17,15 +17,24 @@ export class Level {
 
         this.platforms = data.platforms.map(p => ({
             ...p,
-            y: floor - p.fromBottom - p.height
+            y: floor - p.fromBottom - p.height,
+            prevX: p.x,
+            dx: 0
         }));
     }
 
     update(dt, elapsedTime) {
         this.elapsedTime = elapsedTime;
         this.character.handleInput(this.input);
-        this.character.update(dt);
+        this.character.update(dt, elapsedTime);
         this.camera.follow(this.character);
+        for(const platform of this.platforms) {
+            if(platform.moving) {
+                platform.prevX = platform.x;
+                platform.x = platform.baseX + (platform.amplitude * Math.sin(platform.speed * this.elapsedTime));
+                platform.dx = platform.x - platform.prevX;
+            }
+        }
         this.collisions();
     }
 
@@ -45,9 +54,6 @@ export class Level {
 
     drawPlatforms() {
         for(const platform of this.platforms) {
-            if(platform.moving) {
-                platform.x = platform.baseX + (platform.amplitude * Math.sin(platform.speed * this.elapsedTime));
-            }
             this.ctx.fillStyle = platform.color;
             this.ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
         }
@@ -65,6 +71,8 @@ export class Level {
         this.character.grounded = false;
         if(this.character.y + this.character.height > floor && this.character.vy > 0) {
             this.character.grounded = true;
+            this.character.dx = 0;
+            this.character.dy = 0;
             this.character.stopY();
             this.character.y = floor - this.character.height;
             if(this.character.x > 300 || this.character.x < -300) {
