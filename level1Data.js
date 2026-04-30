@@ -18,7 +18,7 @@ export default {
     platforms: [
        basePlatform,
        ...generatePlatforms(
-            420,
+            10,
             10000,
             100
        )

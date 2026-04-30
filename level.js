@@ -10,6 +10,9 @@ export class Level {
         this.character = new Character(data.spawnPointX, this.ctx.canvas.logicalHeight - 150, 100, 50, "lime", data.speed, data.gravity);
         this.camera = new Camera(ctx);
         this.elapsedTime = null;
+        this.backgroundWidth = 500;
+        this.backgroundImage = new Image();
+        this.backgroundImage.src = "wood.png";
 
         const floor = ctx.canvas.logicalHeight;
 
@@ -41,6 +44,7 @@ export class Level {
     draw() {
         this.camera.begin();
         this.clearCanvas();
+        this.drawBackground();
         this.character.draw(this.ctx);
         this.drawPlatforms();
         this.camera.end();
@@ -63,6 +67,19 @@ export class Level {
         this.ctx.font = "20px Arial";
         this.ctx.fillStyle = "white";
         this.ctx.fillText("Altitude: " + this.altitude, 15, 30);
+    }
+
+    drawBackground() {
+        const bw = this.backgroundWidth;
+        const startX = Math.floor((this.character.x - 4000) / bw) * bw;
+        const startY = Math.floor((this.character.y - 4000) / bw) * bw;
+        for(let i = startY; i < this.character.y + 4000; i += this.backgroundWidth) {
+            for(let j = startX; j < this.character.x + 4000; j += this.backgroundWidth) {
+                this.ctx.drawImage(this.backgroundImage, j, i, this.backgroundWidth, this.backgroundWidth + 1);
+            }
+        }
+        this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; 
+        this.ctx.fillRect(startX, startY, 8000, 8000);
     }
 
     collisions() {
