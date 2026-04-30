@@ -89,6 +89,8 @@ export default class Character {
         if(this.vy > 25) {
             this.currentImage = this.fall;
         } else if(this.vy < 10 && this.animationTime < 0.1) {
+            this.currentImage = this.run1;
+        } else if(this.vy < 10 && this.animationTime < 0.2) {
             this.currentImage = this.jump1;
         } else if(this.vy < 10) {
             this.currentImage = this.jump2;

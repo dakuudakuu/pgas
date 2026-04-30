@@ -80,7 +80,8 @@ export function generatePlatforms(seed, count, startX) {
             color: randomColor(rng),
             moving: moving,
             amplitude: amplitude,
-            speed: speed
+            speed: speed,
+            id: "normalPlatform"
         });
 
         x += direction * (width + gap);

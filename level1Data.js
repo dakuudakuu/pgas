@@ -5,8 +5,9 @@ const basePlatform = {
     fromBottom: -800,
     width: 100000,
     height: 800,
-    color: "green",
-    moving: false
+    color: "sienna",
+    moving: false,
+    id: "basePlatform"
 };
 
 export default {
@@ -18,7 +19,7 @@ export default {
     platforms: [
        basePlatform,
        ...generatePlatforms(
-            10,
+            6767,
             10000,
             100
        )

@@ -13,6 +13,8 @@ export class Level {
         this.backgroundWidth = 500;
         this.backgroundImage = new Image();
         this.backgroundImage.src = "wood.png";
+        this.platformImage = new Image();
+        this.platformImage.src = "steadyplat.png";
 
         const floor = ctx.canvas.logicalHeight;
 
@@ -58,8 +60,12 @@ export class Level {
 
     drawPlatforms() {
         for(const platform of this.platforms) {
-            this.ctx.fillStyle = platform.color;
-            this.ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            if(platform.id == "basePlatform") {
+                this.ctx.fillStyle = platform.color;
+                this.ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            } else {
+                this.ctx.drawImage(this.platformImage, platform.x, platform.y, platform.width, platform.height);
+            }
         }
     }
 
