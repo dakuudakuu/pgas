@@ -85,7 +85,6 @@ export class Level {
         return this.platforms.filter(p => {
             if (p.id === "basePlatform") return true;
             if (p.moving) {
-                // Use sweep range so fast movers aren't culled when swung away
                 const sweepLeft  = p.baseX - p.amplitude;
                 const sweepRight = p.baseX + p.amplitude + p.width;
                 return sweepRight > this.character.x - cullDistance &&
