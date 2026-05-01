@@ -35,9 +35,6 @@ export default class Character {
         this.jump2 = new Image();
         this.jump2.src = "cat_jump_2.png";
 
-        this.sleep = new Image();
-        this.sleep.src = "cat_sleep.png";
-
         this.currentImage = this.idle;
         this.facingLeft = false;
 
@@ -45,6 +42,11 @@ export default class Character {
         this.startTime = 0;
         this.runFPS = 10;
         this.onMovingPlat = false;
+
+        this.hitboxOffsetXRatio = 20 / 85;
+        this.hitboxOffsetYRatio = 30 / 85;
+        this.hitboxWidthRatio = 55 / 85;
+        this.hitboxHeightRatio = 55 / 85;
 
         this.airJumps = 0;
     }
@@ -61,9 +63,9 @@ export default class Character {
         ctx.save();
         if(this.facingLeft) {
             ctx.scale(-1, 1);
-            ctx.drawImage(this.currentImage, -this.x - this.width, this.y - (this.width / 2), this.width, this.width);
+            ctx.drawImage(this.currentImage, -this.x - this.width, this.y, this.width, this.width);
         } else {
-            ctx.drawImage(this.currentImage, this.x, this.y - (this.width / 2), this.width, this.width);
+            ctx.drawImage(this.currentImage, this.x, this.y, this.width, this.width);
         }
         ctx.restore();
     }
@@ -118,6 +120,24 @@ export default class Character {
             this.airJumps++;
             this.vy = -400;
         }
+    }
+
+    get hitbox() {
+        const offsetX = this.hitboxOffsetXRatio * this.width;
+        const offsetY = this.hitboxOffsetYRatio * this.height;
+        const hbWidth = this.hitboxWidthRatio  * this.width;
+        const hbHeight = this.hitboxHeightRatio * this.height;
+
+        const resolvedOffsetX = this.facingLeft
+            ? this.width - offsetX - hbWidth
+            : offsetX;
+
+        return {
+            x: this.x + resolvedOffsetX,
+            y: this.y + offsetY,
+            width:  hbWidth,
+            height: hbHeight,
+        };
     }
 
     stopX() {

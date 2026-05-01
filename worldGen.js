@@ -1,7 +1,8 @@
 function createRng(seed) {
     let s = seed;
     return function () {
-        s = Math.imul(48271, s) | (0 % 2147483647);;
+        s = Math.imul(48271, s) | 0;
+        s %= 2147483647;
         return (s & 2147483647) / 2147483647;
     }
 }
@@ -17,76 +18,82 @@ function randomColor(rng) {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-export function generatePlatforms(seed, count, startX) {
+export function generatePlatforms(seed, targetY) {
     const rng = createRng(seed);
     const platforms = [];
 
-    let x = startX;
-    let fromBottom = 50;
-    let direction = 1;
-    let platformsUntilSwitch = Math.floor(randomBetween(rng, 3, 20));
-    let transitioning = false;
-    let transitionSteps = 0;
+    const maxFromBottom = Math.abs(targetY);
+    const height = 50;
 
-    for (let i = 0; i < count; i++) {
+    let x = 0;
+    let fromBottom = 150;
 
-        if (platformsUntilSwitch <= 0) {
-            direction *= -1;
-            platformsUntilSwitch = Math.floor(randomBetween(rng, 3, 20));
-            transitioning = true;
-            transitionSteps = Math.floor(randomBetween(rng, 2, 4));
-        }
-
-        let gap, heightDelta;
-
-        if (transitioning || platformsUntilSwitch <= 2) {
-            heightDelta = randomBetween(rng, 80, 140);
-            gap = randomBetween(rng, 100, 150);
-            if (transitioning) {
-                transitionSteps--;
-                if (transitionSteps <= 0) transitioning = false;
-            }
-        } else {
-            gap = randomBetween(rng, 250, 450);
-            const t = (gap - 250) / 200;
-
-            const bigJump = rng() < 0.25;
-            const maxHeight = bigJump
-                ? randomBetween(rng, 100, 130)
-                : (130 - t * 100) * randomBetween(rng, 0.3, 1.5);
-
-            heightDelta = randomBetween(rng, 80, Math.max(80, maxHeight));
-        }
-
-        heightDelta = Math.min(heightDelta, 200);
-        fromBottom += heightDelta;
-
-        const width = randomBetween(rng, 50, 400);
-        const height = 50;
-
-        const moving = Math.round(randomBetween(rng, 0, 4)) == 1;
+    while (fromBottom < maxFromBottom) {
+        const width = Math.floor(randomBetween(rng, 80, 400));
+        const moving = Math.round(randomBetween(rng, 0, 4)) === 1;
         const amplitude = randomBetween(rng, 80, 120);
-        let speed = 0;
-        if(moving) {
-            speed = randomBetween(rng, 0.4, 5);
-        }
+        const speed = moving ? randomBetween(rng, 0.4, 5) : 0;
+
+        const clampedX = Math.max(-10000, Math.min(10000, Math.floor(x)));
 
         platforms.push({
-            baseX: Math.floor(x),
-            x: Math.floor(x),
+            baseX: clampedX,
+            x: clampedX,
             fromBottom: Math.floor(fromBottom),
-            width: Math.floor(width),
-            height: Math.floor(height),
+            width,
+            height,
             color: randomColor(rng),
-            moving: moving,
-            amplitude: amplitude,
-            speed: speed,
-            id: "normalPlatform"
+            moving,
+            amplitude,
+            speed,
+            id: "normalPlatform",
+            dx: 0
         });
 
-        x += direction * (width + gap);
-        platformsUntilSwitch--;
+        if (!moving && rng() < 0.2) {
+    const trapWidth = Math.floor(randomBetween(rng, 80, 150));
+    const trapAmplitude = 120;
+    // baseX must be far enough that even at closest swing point (baseX - amplitude),
+    // it's still 500px from the static platform's edge
+    const minGap = 500 + trapAmplitude; // 620px from platform edge to trap's nearest swing
+
+    const rightBase = clampedX + width + minGap;
+    const leftBase  = clampedX - minGap - trapWidth;
+
+    let trapBaseX = null;
+    const preferRight = rng() > 0.5;
+
+    if (preferRight && rightBase + trapWidth <= 10000) {
+        trapBaseX = rightBase;
+    } else if (leftBase >= -10000) {
+        trapBaseX = leftBase;
+    } else if (rightBase + trapWidth <= 10000) {
+        trapBaseX = rightBase;
     }
 
-    return platforms;
+    if (trapBaseX !== null) {
+        platforms.push({
+            baseX: trapBaseX,
+            x: trapBaseX,
+            fromBottom: Math.floor(fromBottom),
+            width: trapWidth,
+            height,
+            color: randomColor(rng),
+            moving: true,
+            amplitude: trapAmplitude,
+            speed: 5,
+            id: "normalPlatform",
+            dx: 0
+        });
+    }
 }
+
+        x += randomBetween(rng, 200, 600) * (rng() > 0.5 ? 1 : -1);
+        fromBottom += randomBetween(rng, 150, 200);
+
+        if (x > 10000) x -= randomBetween(rng, 5000, 15000);
+        if (x < -10000) x += randomBetween(rng, 5000, 15000);
+    }  // ← closes while
+
+    return platforms;
+}  // ← closes function
