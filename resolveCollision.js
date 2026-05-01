@@ -1,6 +1,6 @@
 import { rectIntersects } from "./rectIntersects.js";
 
-export function resolveCollision(char, rect) {
+export function resolveCollision(char, rect, floor) {
     const hb = char.hitbox;
     if (!rectIntersects(hb, rect)) return;
 
@@ -15,10 +15,20 @@ export function resolveCollision(char, rect) {
     const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
 
     if (minOverlap === overlapTop && char.vy > 0) {
-        char.y = rect.y - offsetY - hb.height;
-        char.stopY();
-        char.grounded = true;
-        char.x += rect.dx;
+        if(char.vy > 1800) {
+            char.grounded = true;
+            char.stopY();
+            const offsetY = hb.y - char.y;
+            char.y = floor - offsetY - hb.height;
+            if (char.x > 300 || char.x < -300) {
+                char.x = -100;
+            }
+        } else {
+            char.y = rect.y - offsetY - hb.height;
+            char.stopY();
+            char.grounded = true;
+            char.x += rect.dx;
+        }
     } else if (minOverlap === overlapBottom && char.vy < 0) {
         char.y = rect.y + rect.height - offsetY;
         char.stopY();

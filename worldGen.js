@@ -52,7 +52,7 @@ export function generatePlatforms(seed, targetY) {
 
         if (!moving && rng() < 0.2) {
     const trapWidth = Math.floor(randomBetween(rng, 80, 150));
-    const trapAmplitude = 120;
+    const trapAmplitude = 300;
     // baseX must be far enough that even at closest swing point (baseX - amplitude),
     // it's still 500px from the static platform's edge
     const minGap = 500 + trapAmplitude; // 620px from platform edge to trap's nearest swing
@@ -81,7 +81,7 @@ export function generatePlatforms(seed, targetY) {
             color: randomColor(rng),
             moving: true,
             amplitude: trapAmplitude,
-            speed: 5,
+            speed: 2.5,
             id: "normalPlatform",
             dx: 0
         });

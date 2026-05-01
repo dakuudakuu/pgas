@@ -78,6 +78,7 @@ export class Level {
         this.ctx.fillStyle = "white";
         this.ctx.fillText("Altitude: " + this.altitude, 15, 30);
         this.ctx.fillText("Top Altitude: " + this.topAltitude, 15, 60);
+        this.ctx.fillText("dy: " + Math.round(this.character.vy), 15, 90);
     }
 
     get nearbyPlatforms() {
@@ -132,7 +133,7 @@ export class Level {
                 width: platform.width,
                 height: platform.height - 15
             }
-            resolveCollision(this.character, platformHitbox);
+            resolveCollision(this.character, platformHitbox, floor);
         }
     }
 }
