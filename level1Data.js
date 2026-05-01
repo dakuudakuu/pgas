@@ -20,7 +20,7 @@ export default {
        basePlatform,
        ...generatePlatforms(
             6767,
-            100000,
+            10000000,
        )
     ]
 }
