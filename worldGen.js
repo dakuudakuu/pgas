@@ -51,42 +51,40 @@ export function generatePlatforms(seed, targetY) {
         });
 
         if (!moving && rng() < 0.2) {
-    const trapWidth = Math.floor(randomBetween(rng, 80, 150));
-    const trapAmplitude = 300;
-    // baseX must be far enough that even at closest swing point (baseX - amplitude),
-    // it's still 500px from the static platform's edge
-    const minGap = 500 + trapAmplitude; // 620px from platform edge to trap's nearest swing
+            const trapWidth = Math.floor(randomBetween(rng, 80, 150));
+            const trapAmplitude = 300;
+            const minGap = 500 + trapAmplitude;
 
-    const rightBase = clampedX + width + minGap;
-    const leftBase  = clampedX - minGap - trapWidth;
+            const rightBase = clampedX + width + minGap;
+            const leftBase  = clampedX - minGap - trapWidth;
 
-    let trapBaseX = null;
-    const preferRight = rng() > 0.5;
+            let trapBaseX = null;
+            const preferRight = rng() > 0.5;
 
-    if (preferRight && rightBase + trapWidth <= 10000) {
-        trapBaseX = rightBase;
-    } else if (leftBase >= -10000) {
-        trapBaseX = leftBase;
-    } else if (rightBase + trapWidth <= 10000) {
-        trapBaseX = rightBase;
-    }
+            if (preferRight && rightBase + trapWidth <= 10000) {
+                trapBaseX = rightBase;
+            } else if (leftBase >= -10000) {
+                trapBaseX = leftBase;
+            } else if (rightBase + trapWidth <= 10000) {
+                trapBaseX = rightBase;
+            }
 
-    if (trapBaseX !== null) {
-        platforms.push({
-            baseX: trapBaseX,
-            x: trapBaseX,
-            fromBottom: Math.floor(fromBottom),
-            width: trapWidth,
-            height,
-            color: randomColor(rng),
-            moving: true,
-            amplitude: trapAmplitude,
-            speed: 2.5,
-            id: "normalPlatform",
-            dx: 0
-        });
-    }
-}
+            if (trapBaseX !== null) {
+                platforms.push({
+                    baseX: trapBaseX,
+                    x: trapBaseX,
+                    fromBottom: Math.floor(fromBottom),
+                    width: trapWidth,
+                    height,
+                    color: randomColor(rng),
+                    moving: true,
+                    amplitude: trapAmplitude,
+                    speed: 2.5,
+                    id: "normalPlatform",
+                    dx: 0
+                });
+            }
+        }
 
         x += randomBetween(rng, 200, 600) * (rng() > 0.5 ? 1 : -1);
         fromBottom += randomBetween(rng, 150, 200);
