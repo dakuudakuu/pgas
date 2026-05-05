@@ -6,92 +6,117 @@ function createRng(seed) {
         return (s & 2147483647) / 2147483647;
     }
 }
-
+ 
 function randomBetween(rng, min, max) {
     return rng() * (max - min) + min;
 }
-
+ 
 function randomColor(rng) {
-    const r = Math.floor(rng() * 255);
-    const g = Math.floor(rng() * 255);
-    const b = Math.floor(rng() * 255);
+    const r = Math.floor(rng() * 256);
+    const g = Math.floor(rng() * 256);
+    const b = Math.floor(rng() * 256);
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-export function generatePlatforms(seed, targetY) {
-    const rng = createRng(seed);
-    const platforms = [];
+export class WorldGen {
+    /**
+     * @param {number} seed         
+     * @param {number} maxFromBottom   
+     * @param {number} floorY         
+     * @param {number} [chunkSize=6000]- 
+     */
+    constructor(seed, maxFromBottom, floorY, chunkSize = 6000) {
+        this._rng            = createRng(seed);
+        this._maxFromBottom  = maxFromBottom;
+        this._floorY         = floorY;
+        this._chunkSize      = chunkSize;
+        this._platformHeight = 50;
+ 
+        this._curX          = 0;
+        this._curFromBottom = 150;
+        this._done          = false;
 
-    const maxFromBottom = Math.abs(targetY);
-    const height = 50;
-
-    let x = 0;
-    let fromBottom = 150;
-
-    while (fromBottom < maxFromBottom) {
-        const width = Math.floor(randomBetween(rng, 80, 400));
+        this.platforms = [
+             {
+                x: -5000,
+                y: this._floorY,      
+                fromBottom: -200,
+                width: 100000,
+                height: 200,
+                color: "darkslategrey",
+                moving: false,
+                id: "basePlatform",
+                prevX: -5000,          
+                dx: 0                
+            }
+        ];
+    }
+ 
+    ensureGenerated(currentFromBottom) {
+        if (this._done) return;
+        const target = Math.min(currentFromBottom + this._chunkSize, this._maxFromBottom);
+        while (this._curFromBottom < target) {
+            this._generateNext();
+        }
+        if (this._curFromBottom >= this._maxFromBottom) {
+            this._done = true;
+        }
+    }
+ 
+    _generateNext() {
+        const rng    = this._rng;
+        const h      = this._platformHeight;
+        const floor  = this._floorY;
+        const fb     = Math.floor(this._curFromBottom);
+        const y      = floor - fb - h;
+        const width  = Math.floor(randomBetween(rng, 80, 400));
         const moving = Math.round(randomBetween(rng, 0, 4)) === 1;
-        const amplitude = randomBetween(rng, 80, 120);
-        const speed = moving ? randomBetween(rng, 0.4, 5) : 0;
-
-        const clampedX = Math.max(-10000, Math.min(10000, Math.floor(x)));
-
-        platforms.push({
-            baseX: clampedX,
-            x: clampedX,
-            fromBottom: Math.floor(fromBottom),
-            width,
-            height,
-            color: randomColor(rng),
-            moving,
-            amplitude,
-            speed,
+        const amp    = randomBetween(rng, 80, 120);
+        const speed  = moving ? randomBetween(rng, 0.4, 5) : 0;
+        const cx     = Math.max(-10000, Math.min(10000, Math.floor(this._curX)));
+ 
+        this.platforms.push({
             id: "normalPlatform",
+            baseX: cx, x: cx, prevX: cx,
+            fromBottom: fb, y,
+            width, height: h,
+            color: randomColor(rng),
+            moving, amplitude: amp, speed,
             dx: 0
         });
-
+ 
         if (!moving && rng() < 0.2) {
             const trapWidth = Math.floor(randomBetween(rng, 80, 150));
-            const trapAmplitude = 300;
-            const minGap = 500 + trapAmplitude;
-
-            const rightBase = clampedX + width + minGap;
-            const leftBase  = clampedX - minGap - trapWidth;
-
-            let trapBaseX = null;
-            const preferRight = rng() > 0.5;
-
-            if (preferRight && rightBase + trapWidth <= 10000) {
-                trapBaseX = rightBase;
-            } else if (leftBase >= -10000) {
-                trapBaseX = leftBase;
-            } else if (rightBase + trapWidth <= 10000) {
-                trapBaseX = rightBase;
-            }
-
+            const trapAmp   = Math.floor(randomBetween(rng, 275, 350));
+            const speed = randomBetween(rng, 2.5, 3);
+            const minGap    = 500 + trapAmp;
+            const rightBase = cx + width + minGap;
+            const leftBase  = cx - minGap - trapWidth;
+ 
+            let trapBaseX   = null;
+            const goRight   = rng() > 0.5;
+ 
+            if      (goRight && rightBase + trapWidth <= 10000) trapBaseX = rightBase;
+            else if (leftBase >= -10000)                        trapBaseX = leftBase;
+            else if (rightBase + trapWidth <= 10000)            trapBaseX = rightBase;
+ 
             if (trapBaseX !== null) {
-                platforms.push({
-                    baseX: trapBaseX,
-                    x: trapBaseX,
-                    fromBottom: Math.floor(fromBottom),
-                    width: trapWidth,
-                    height,
-                    color: randomColor(rng),
-                    moving: true,
-                    amplitude: trapAmplitude,
-                    speed: 2.5,
+                this.platforms.push({
                     id: "normalPlatform",
+                    baseX: trapBaseX, x: trapBaseX, prevX: trapBaseX,
+                    fromBottom: fb, y,
+                    width: trapWidth, height: h,
+                    color: randomColor(rng),
+                    moving: true, amplitude: trapAmp, speed: 2.5,
                     dx: 0
                 });
             }
         }
 
-        x += randomBetween(rng, 200, 600) * (rng() > 0.5 ? 1 : -1);
-        fromBottom += randomBetween(rng, 150, 200);
-
-        if (x > 10000) x -= randomBetween(rng, 5000, 15000);
-        if (x < -10000) x += randomBetween(rng, 5000, 15000);
-    }  // ← closes while
-
-    return platforms;
-}  // ← closes function
+        this._curX          += randomBetween(rng, 200, 600) * (rng() > 0.5 ? 1 : -1);
+        this._curFromBottom += randomBetween(rng, 150, 200);
+ 
+        if (this._curX >  10000) this._curX -= randomBetween(rng, 5000, 15000);
+        if (this._curX < -10000) this._curX += randomBetween(rng, 5000, 15000);
+    }
+}

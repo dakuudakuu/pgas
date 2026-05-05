@@ -1,5 +1,3 @@
-import { generatePlatforms } from "./worldGen.js"
-
 const basePlatform = {
     x: -5000,
     fromBottom: -800,
@@ -12,15 +10,10 @@ const basePlatform = {
 
 export default {
     spawnPointX: -100,
-    spawnPointY: 100,
+    fromBottomY: 100,
     backgroundColor: "#000000",
     speed: 300,
     gravity: 700,
-    platforms: [
-       basePlatform,
-       ...generatePlatforms(
-            676767,
-            10000000,
-       )
-    ]
+    seed: 676767,
+    maxFromBottom: 100000000
 }

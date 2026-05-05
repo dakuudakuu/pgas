@@ -1,32 +1,30 @@
 import Character from "./character.js";
 import { resolveCollision } from "./resolveCollision.js";
 import Camera from "./camera.js";
+import { WorldGen } from "./worldGen.js";
 
 export class Level {
     constructor(ctx, input, data) {
         this.ctx = ctx;
         this.input = input;
         this.data = data;
-        this.character = new Character(data.spawnPointX, this.ctx.canvas.logicalHeight - 150, 120, 120, "lime", data.speed, data.gravity);
+        this.character = new Character(data.spawnPointX, ctx.canvas.logicalHeight - data.fromBottomY, 120, 120, "lime", data.speed, data.gravity);
         this.camera = new Camera(ctx);
         this.elapsedTime = null;
         this.backgroundWidth = 500;
         this.backgroundImage = new Image();
-        this.backgroundImage.src = "wood.png";
+        this.backgroundImage.src = "forest.jpg";
         this.platformImage = new Image();
         this.platformImage.src = "platform.png";
+        this.worldGen = new WorldGen(data.seed, data.maxFromBottom, ctx.canvas.logicalHeight, 6000);
 
         const floor = ctx.canvas.logicalHeight;
 
         this.altitude = Math.ceil((floor - (this.character.y + this.character.height)) / 30);
         this.topAltitude = this.altitude;
 
-        this.platforms = data.platforms.map(p => ({
-            ...p,
-            y: floor - p.fromBottom - p.height,
-            prevX: p.x,
-            dx: 0
-        }));
+        const fromBottom = floor - (this.character.y + this.character.height);
+        this.worldGen.ensureGenerated(fromBottom);
     }
 
     update(dt, elapsedTime) {
@@ -34,6 +32,8 @@ export class Level {
         this.character.handleInput(this.input);
         this.character.update(dt, elapsedTime);
         this.camera.follow(this.character);
+        const fromBottom = this.ctx.canvas.logicalHeight - (this.character.y + this.character.height);
+        this.worldGen.ensureGenerated(fromBottom);
         if(this.topAltitude < this.altitude) {
             this.topAltitude = this.altitude;
         }
@@ -78,12 +78,11 @@ export class Level {
         this.ctx.fillStyle = "white";
         this.ctx.fillText("Altitude: " + this.altitude, 15, 30);
         this.ctx.fillText("Top Altitude: " + this.topAltitude, 15, 60);
-        this.ctx.fillText("dy: " + Math.round(this.character.vy), 15, 90);
     }
 
     get nearbyPlatforms() {
         const cullDistance = 2000;
-        return this.platforms.filter(p => {
+        return this.worldGen.platforms.filter(p => {
             if (p.id === "basePlatform") return true;
             if (p.moving) {
                 const sweepLeft  = p.baseX - p.amplitude;
@@ -106,7 +105,7 @@ export class Level {
                 this.ctx.drawImage(this.backgroundImage, j, i, this.backgroundWidth, this.backgroundWidth + 1);
             }
         }
-        this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; 
+        this.ctx.fillStyle = "rgba(0, 0, 0, 0)"; 
         this.ctx.fillRect(startX, startY, 8000, 8000);
     }
 
