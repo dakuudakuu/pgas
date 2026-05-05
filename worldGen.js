@@ -1,12 +1,15 @@
 function createRng(seed) {
-    let s = seed;
+    let s = seed % 2147483647;
+    if (s <= 0) s += 2147483646;
     return function () {
-        s = Math.imul(48271, s) | 0;
-        s %= 2147483647;
-        return (s & 2147483647) / 2147483647;
-    }
+        const hi = Math.floor(s / 44488);
+        const lo = s % 44488;
+        s = 48271 * lo - 3399 * hi;
+        if (s <= 0) s += 2147483647;
+        return (s - 1) / 2147483646;
+    };
 }
- 
+
 function randomBetween(rng, min, max) {
     return rng() * (max - min) + min;
 }

@@ -22,6 +22,8 @@ export class Level {
 
         this.altitude = Math.ceil((floor - (this.character.y + this.character.height)) / 30);
         this.topAltitude = this.altitude;
+        this.scoreMultiplier = 1;
+        this.score = this.topAltitude * this.scoreMultiplier;
 
         const fromBottom = floor - (this.character.y + this.character.height);
         this.worldGen.ensureGenerated(fromBottom);
@@ -37,6 +39,7 @@ export class Level {
         if(this.topAltitude < this.altitude) {
             this.topAltitude = this.altitude;
         }
+        this.score = this.topAltitude * this.scoreMultiplier;
         for(const platform of this.nearbyPlatforms) {
             if(platform.moving) {
                 platform.prevX = platform.x;
@@ -77,7 +80,7 @@ export class Level {
         this.ctx.font = "20px Arial";
         this.ctx.fillStyle = "white";
         this.ctx.fillText("Altitude: " + this.altitude, 15, 30);
-        this.ctx.fillText("Top Altitude: " + this.topAltitude, 15, 60);
+        this.ctx.fillText("Score: " + this.score, 15, 60);
     }
 
     get nearbyPlatforms() {
