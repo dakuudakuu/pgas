@@ -14,6 +14,6 @@ export default {
     backgroundColor: "#000000",
     speed: 300,
     gravity: 700,
-    seed: 676767,
+    seed: 10,
     maxFromBottom: 100000000
 }

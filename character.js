@@ -12,6 +12,11 @@ export default class Character {
         this.gravity = gravity;
         this.grounded = false;
 
+        this.runSound = new Audio("run.mp3");
+        this.runSound.loop = true;
+        this.wooshSound = new Audio("woosh.mp3");
+        this.jumpSound = new Audio("jump.mp3");
+
         this.left = false;
         this.right = false;
         this.up = false;
@@ -52,11 +57,11 @@ export default class Character {
     }
 
     handleInput(input) {
-        this.isLeft = input.isDown("arrowleft");
-        this.isRight = input.isDown("arrowright");
-        this.wasUp = input.wasPressed("arrowup");
-        this.wasLeft = input.wasPressed("arrowleft");
-        this.wasRight = input.wasPressed("arrowright");
+        this.isLeft = input.isDown("arrowleft") || input.isDown("a");
+        this.isRight = input.isDown("arrowright") || input.isDown("d");
+        this.wasUp = input.wasPressed("arrowup") || input.wasPressed(" ") || input.wasPressed("w");
+        this.wasLeft = input.wasPressed("arrowleft") || input.wasPressed("a");
+        this.wasRight = input.wasPressed("arrowright") || input.wasPressed("d");
     }
 
     draw(ctx) {
@@ -115,8 +120,14 @@ export default class Character {
         }
 
         if(this.wasUp && this.grounded) {
+            // this.jumpSound.pause();
+            // this.jumpSound.currentTime = 0;
+            // this.jumpSound.play();
             this.vy = -400;
         } else if(this.wasUp && this.airJumps == 0) {
+            // this.wooshSound.pause();
+            // this.wooshSound.currentTime = 0;
+            // this.wooshSound.play();
             this.airJumps++;
             this.vy = -400;
         }

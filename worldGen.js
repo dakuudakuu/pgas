@@ -50,7 +50,8 @@ export class WorldGen {
                 moving: false,
                 id: "basePlatform",
                 prevX: -5000,          
-                dx: 0                
+                dx: 0,
+                hasMouse: false                
             }
         ];
     }
@@ -85,10 +86,11 @@ export class WorldGen {
             width, height: h,
             color: randomColor(rng),
             moving, amplitude: amp, speed,
-            dx: 0
+            dx: 0,
+            hasMouse: false
         });
  
-        if (!moving && rng() < 0.2) {
+        if (!moving && rng() < 0.05) {
             const trapWidth = Math.floor(randomBetween(rng, 80, 150));
             const trapAmp   = Math.floor(randomBetween(rng, 275, 350));
             const speed = randomBetween(rng, 2.5, 3);
@@ -111,12 +113,13 @@ export class WorldGen {
                     width: trapWidth, height: h,
                     color: randomColor(rng),
                     moving: true, amplitude: trapAmp, speed: 2.5,
-                    dx: 0
+                    dx: 0,
+                    hasMouse: true
                 });
             }
         }
 
-        this._curX          += randomBetween(rng, 200, 600) * (rng() > 0.5 ? 1 : -1);
+        this._curX          += randomBetween(rng, 400, 600) * (rng() > 0.5 ? 1 : -1);
         this._curFromBottom += randomBetween(rng, 150, 200);
  
         if (this._curX >  10000) this._curX -= randomBetween(rng, 5000, 15000);

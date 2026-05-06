@@ -2,6 +2,7 @@ import Character from "./character.js";
 import { resolveCollision } from "./resolveCollision.js";
 import Camera from "./camera.js";
 import { WorldGen } from "./worldGen.js";
+import { rectIntersects } from "./rectIntersects.js";
 
 export class Level {
     constructor(ctx, input, data) {
@@ -11,12 +12,19 @@ export class Level {
         this.character = new Character(data.spawnPointX, ctx.canvas.logicalHeight - data.fromBottomY, 120, 120, "lime", data.speed, data.gravity);
         this.camera = new Camera(ctx);
         this.elapsedTime = null;
-        this.backgroundWidth = 500;
+        this.backgroundWidth = 900;
         this.backgroundImage = new Image();
         this.backgroundImage.src = "forest.jpg";
         this.platformImage = new Image();
         this.platformImage.src = "platform.png";
+        this.mouseImage = new Image();
+        this.mouseImage.src = "mouse.png";
+        this.mouseSize = 50;
         this.worldGen = new WorldGen(data.seed, data.maxFromBottom, ctx.canvas.logicalHeight, 6000);
+        this.landSound = new Audio("land.mp3");
+        this.runSound = new Audio("run.mp3");
+        this.runSound.loop = true;
+        this.running = false;
 
         const floor = ctx.canvas.logicalHeight;
 
@@ -40,6 +48,7 @@ export class Level {
             this.topAltitude = this.altitude;
         }
         this.score = this.topAltitude * this.scoreMultiplier;
+        this.running = false;
         for(const platform of this.nearbyPlatforms) {
             if(platform.moving) {
                 platform.prevX = platform.x;
@@ -72,6 +81,9 @@ export class Level {
                 this.ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
             } else {
                 this.ctx.drawImage(this.platformImage, platform.x, platform.y, platform.width, platform.height);
+                if(platform.hasMouse) {
+                    this.ctx.drawImage(this.mouseImage, platform.x + (platform.width / 2) - (this.mouseSize / 2), platform.y - (this.mouseSize) + 14, this.mouseSize, this.mouseSize);
+                }
             }
         }
     }
@@ -80,7 +92,8 @@ export class Level {
         this.ctx.font = "20px Arial";
         this.ctx.fillStyle = "white";
         this.ctx.fillText("Altitude: " + this.altitude, 15, 30);
-        this.ctx.fillText("Score: " + this.score, 15, 60);
+        this.ctx.fillText("Score: " + Math.round(this.score), 15, 60);
+        this.ctx.fillText("Multiplier: " + this.scoreMultiplier.toFixed(1), 15, 90)
     }
 
     get nearbyPlatforms() {
@@ -135,7 +148,24 @@ export class Level {
                 width: platform.width,
                 height: platform.height - 15
             }
+
+            let mouseHitbox = {
+                x: platform.x + (platform.width / 2) - (this.mouseSize / 2),
+                y: platform.y - this.mouseSize + 14,
+                width: this.mouseSize,
+                height: this.mouseSize,
+                dx: platform.dx,
+            }
+
             resolveCollision(this.character, platformHitbox, floor);
+            if(rectIntersects(mouseHitbox, this.character) && platform.hasMouse) {
+                platform.hasMouse = false;
+                this.scoreMultiplier += 0.1;
+            }
+
+            if(rectIntersects(platform, this.character) && (this.character.isLeft) || (this.character.isRight)) {
+                this.running = true;
+            }
         }
     }
 }
