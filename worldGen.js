@@ -77,7 +77,7 @@ export class WorldGen {
         const moving = Math.round(randomBetween(rng, 0, 4)) === 1;
         const amp    = randomBetween(rng, 80, 120);
         const speed  = moving ? randomBetween(rng, 0.4, 5) : 0;
-        const cx     = Math.max(-10000, Math.min(10000, Math.floor(this._curX)));
+        const cx = Math.floor(this._curX);
  
         this.platforms.push({
             id: "normalPlatform",
@@ -95,15 +95,7 @@ export class WorldGen {
             const trapAmp   = Math.floor(randomBetween(rng, 275, 350));
             const speed = randomBetween(rng, 2.5, 3);
             const minGap    = 500 + trapAmp;
-            const rightBase = cx + width + minGap;
-            const leftBase  = cx - minGap - trapWidth;
- 
-            let trapBaseX   = null;
-            const goRight   = rng() > 0.5;
- 
-            if      (goRight && rightBase + trapWidth <= 10000) trapBaseX = rightBase;
-            else if (leftBase >= -10000)                        trapBaseX = leftBase;
-            else if (rightBase + trapWidth <= 10000)            trapBaseX = rightBase;
+            const trapBaseX = rng() > 0.5 ? cx + width + minGap : cx - minGap - trapWidth;
  
             if (trapBaseX !== null) {
                 this.platforms.push({
@@ -121,8 +113,5 @@ export class WorldGen {
 
         this._curX          += randomBetween(rng, 400, 600) * (rng() > 0.5 ? 1 : -1);
         this._curFromBottom += randomBetween(rng, 150, 200);
- 
-        if (this._curX >  10000) this._curX -= randomBetween(rng, 5000, 15000);
-        if (this._curX < -10000) this._curX += randomBetween(rng, 5000, 15000);
     }
 }

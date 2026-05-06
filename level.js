@@ -49,6 +49,9 @@ export class Level {
         }
         this.score = this.topAltitude * this.scoreMultiplier;
         this.running = false;
+        if(this.input.wasPressed("l")) {
+            console.log(this.worldGen._done);
+        }
         for(const platform of this.nearbyPlatforms) {
             if(platform.moving) {
                 platform.prevX = platform.x;
@@ -99,16 +102,7 @@ export class Level {
     get nearbyPlatforms() {
         const cullDistance = 2000;
         return this.worldGen.platforms.filter(p => {
-            if (p.id === "basePlatform") return true;
-            if (p.moving) {
-                const sweepLeft  = p.baseX - p.amplitude;
-                const sweepRight = p.baseX + p.amplitude + p.width;
-                return sweepRight > this.character.x - cullDistance &&
-                    sweepLeft  < this.character.x + cullDistance &&
-                    Math.abs(p.y - this.character.y) < cullDistance;
-            }
-            return Math.abs(p.x - this.character.x) < cullDistance &&
-                Math.abs(p.y - this.character.y) < cullDistance;
+            return Math.abs(p.y - this.character.y) < cullDistance;
         });
     }
 
